@@ -12,15 +12,14 @@ use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Translation\FileLoader;
 use Illuminate\Contracts\Filesystem\Factory;
-use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use App\RegisterUser;
+use App\User;
 Use Illuminate\Support\Facades\Hash;
 use DateTime;
 use Mail;
 use Illuminate\Http\Request;
 use App\Gender;
+use Auth;
 
 class FrameworkController extends BaseController {
 
@@ -58,7 +57,7 @@ class FrameworkController extends BaseController {
 
 
             $info = null;
-            $ExhistEmail = RegisterUser::select('UserName')->where('UserName', $Email)->count();
+            $ExhistEmail = User::select('UserName')->where('UserName', $Email)->count();
             if ($ExhistEmail == 0) {
                 $val = Mail::raw($body, function ($ValidationToken)use($Email) {
 
@@ -70,7 +69,7 @@ class FrameworkController extends BaseController {
                 foreach ($GenderId as $key) {
                     $Retrive_Id = $key->GenderId;
                 }
-                $user = RegisterUser::create(['FirstName' => $FirstName,
+                $user = User::create(['FirstName' => $FirstName,
                             'LastName' => $lastName,
                             'GenderId' => $Retrive_Id,
                             'UserName' => $Email,
@@ -90,13 +89,14 @@ class FrameworkController extends BaseController {
     //------------------------------Login USing Validation Token ----------------------//
 
     public function Login($ValidationToken) {
-        $Check = RegisterUser::select('FirstName')->where('ValidationToken', $ValidationToken)->get();
+
+        $Check = User::select('FirstName')->where('ValidationToken', $ValidationToken)->get();
         $Check = json_decode($Check);
         foreach ($Check as $key)
             $name = $key->FirstName;
         if (count($Check) > 0) {
 
-            RegisterUser::where('ValidationToken', $ValidationToken)->update(['IsValidated' => 1]);
+            User::where('ValidationToken', $ValidationToken)->update(['IsValidated' => 1]);
             return Redirect::route('Dashboard')
                             ->with('Login', $name);
         } else {
@@ -112,23 +112,23 @@ class FrameworkController extends BaseController {
 
     public function loggedIn() {
         $Email = Input::get('UserName');
-
         $Password = Input::get('Password');
-        $validate = RegisterUser::select('UserName', 'FirstName')->where('UserName', $Email)->where('Password', $Password)->get();
-
+        $validate = User::select('UserName', 'FirstName')->where('UserName', $Email)->where('Password', $Password)->get();
         if (count($validate) > 0) {
+            $user = User::where('UserName', $Email)->where('Password', $Password)->first();
+            Auth::login($user);
+            //  echo Auth::user();
+
             $validate = json_decode($validate);
             foreach ($validate as $key) {
-                session(['UserName' => $key->UserName]);
                 $name = $key->FirstName;
             }
             return Redirect::route('Dashboard')
                             ->with('Login', $name);
         } else {
-
             $validate = "Invalid Crendentials";
-            return Redirect::route('Login')
-                            ->withErrors($name)
+            return Redirect::route('login')
+                            ->withErrors($validate)
                             ->withInput();
         }
     }
@@ -137,8 +137,7 @@ class FrameworkController extends BaseController {
 
     public function retrivepassword() {
         $Email = Input::get('UserName');
-        $validate = RegisterUser::select('Password')->where('UserName', $Email)->get();
-
+        $validate = User::select('Password')->where('UserName', $Email)->get();
         if (count($validate) > 0) {
             $validate = json_decode($validate);
             foreach ($validate as $key)
@@ -146,16 +145,33 @@ class FrameworkController extends BaseController {
             $body = "Dear User Registered Password of your respective email Id.
                     $password";
             Mail::raw($body, function ($password)use($Email) {
-
                 $password->from('kaveri.nagunuri@karmanya.co.in', 'kaveri');
                 $password->to($Email)->subject('Retrived Password');
             });
             $alert = "Password is send to your email Id";
         } else
             $alert = "Your Email Id is not registered.Please Registered to access";
-
         return Redirect::route('forgotpassword')
                         ->with('password_message', $alert);
+    }
+
+    public function changepassword() {
+
+        return view('Login.changepassword');
+    }
+
+    public function resetpassword() {
+        $Email = Input::get('UserName');
+        $Password = Input::get('Password');
+        $reset = User::where('UserName', $Email)->update(['Password' => $Password]);
+        return Redirect::route('changepassword')
+                        ->with('changepassword', 'Password successfully changed');
+    }
+
+    public function logout() {
+        Auth::logout();
+        return Redirect::route('login')
+                        ->with('logout', 'successfully logged out');
     }
 
 }

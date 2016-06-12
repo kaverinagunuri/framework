@@ -281,7 +281,7 @@
                                             <a href="#" class="btn btn-default btn-flat">Profile</a>
                                         </div>
                                         <div class="pull-right">
-                                            <a href="#" class="btn btn-default btn-flat">Sign out</a>
+                                            <a href="{{URL::route('logout')}}" class="btn btn-default btn-flat">Sign out</a>
                                         </div>
                                     </li>
                                 </ul>
@@ -324,6 +324,12 @@
                         <li class="active treeview">
                             <a href="{{URL::route('Dashboard')}}">
                                 <i class="fa fa-dashboard"></i> <span>Dashboard</span> <i class="fa fa-angle-left pull-right"></i>
+                            </a>
+
+                        </li>
+                        <li class="active treeview">
+                            <a href="{{URL::route('changepassword')}}">
+                                <i class="glyphicon glyphicon-edit"></i> <span>Change Password</span>
                             </a>
 
                         </li>
@@ -470,11 +476,11 @@
                                 </a>
                             </li>
                         </ul>
-                       
+
                     </div>
-                   
+
                     <div class="tab-pane" id="control-sidebar-stats-tab">Stats Tab Content</div>
-                   
+
                     <div class="tab-pane" id="control-sidebar-settings-tab">
                         <form method="post">
                             <h3 class="control-sidebar-heading">General Settings</h3>

@@ -31,6 +31,9 @@
             </div>
 
             <div class="login-box-body">
+                @if ( session()->has('logout') )
+                <div class="alert alert-info"> {{ session()->get('logout') }}</div>
+                @endif
                 @if (count($errors) > 0)
                 <div class="alert alert-danger">
                     <ul>
