@@ -30,6 +30,16 @@ class FrameworkController extends BaseController {
 
     //------------------------------Registration----------------------//
 
+
+    public function index() {
+        if (Auth::check()) {
+            return Redirect::route('Dashboard');
+        } else {
+
+            return view('Layouts/register');
+        }
+    }
+
     public function Register() {
         $FirstName = Input::get('FirstName');
         $lastName = Input::get('LastName');
@@ -88,17 +98,17 @@ class FrameworkController extends BaseController {
 
     //------------------------------Login USing Validation Token ----------------------//
 
-    public function Login($ValidationToken) {
+    public function ValidationToken($ValidationToken) {
 
         $Check = User::select('FirstName')->where('ValidationToken', $ValidationToken)->get();
         $Check = json_decode($Check);
-        foreach ($Check as $key)
-            $name = $key->FirstName;
+
         if (count($Check) > 0) {
+            $user = User::where('ValidationToken', $ValidationToken)->first();
+            Auth::login($user);
 
             User::where('ValidationToken', $ValidationToken)->update(['IsValidated' => 1]);
-            return Redirect::route('Dashboard')
-                            ->with('Login', $name);
+            return Redirect::route('Dashboard');
         } else {
 
             $validate = "Invalid Token";
@@ -109,6 +119,14 @@ class FrameworkController extends BaseController {
     }
 
     //------------------------------Login----------------------//
+    public function Login() {
+        if (Auth::check()) {
+            return Redirect::route('Dashboard');
+        } else {
+
+            return view('Layouts/login');
+        }
+    }
 
     public function loggedIn() {
         $Email = Input::get('UserName');
@@ -117,14 +135,10 @@ class FrameworkController extends BaseController {
         if (count($validate) > 0) {
             $user = User::where('UserName', $Email)->where('Password', $Password)->first();
             Auth::login($user);
-            //  echo Auth::user();
+            //dd(Auth::user()->Id);
 
             $validate = json_decode($validate);
-            foreach ($validate as $key) {
-                $name = $key->FirstName;
-            }
-            return Redirect::route('Dashboard')
-                            ->with('Login', $name);
+            return Redirect::route('Dashboard');
         } else {
             $validate = "Invalid Crendentials";
             return Redirect::route('login')
@@ -133,7 +147,20 @@ class FrameworkController extends BaseController {
         }
     }
 
+    public function Dashboard() {
+        $name = Auth::user()->FirstName;
+        return view('Login/Dashboard', ['name' => $name]);
+    }
+
     //------------------------------Forgot Password----------------------//
+    public function forgotpassword() {
+        if (Auth::check()) {
+            return Redirect::route('Dashboard');
+        } else {
+
+            return view('Layouts/Forgot');
+        }
+    }
 
     public function retrivepassword() {
         $Email = Input::get('UserName');
@@ -155,9 +182,13 @@ class FrameworkController extends BaseController {
                         ->with('password_message', $alert);
     }
 
-    public function changepassword() {
+    //--------------------------Change Password----------------------//
 
-        return view('Login.changepassword');
+    public function changepassword() {
+        $UserName = Auth::user()->UserName;
+        $name = Auth::user()->FirstName;
+
+        return view('Login.changepassword', ['UserName' => $UserName, 'name' => $name]);
     }
 
     public function resetpassword() {
@@ -168,10 +199,13 @@ class FrameworkController extends BaseController {
                         ->with('changepassword', 'Password successfully changed');
     }
 
+    //------------------------Logout---------------------------//
+
     public function logout() {
         Auth::logout();
-        return Redirect::route('login')
-                        ->with('logout', 'successfully logged out');
+         return redirect(\URL::previous());
+//        return Redirect::route('login')
+//                        ->with('logout', 'successfully logged out');
     }
 
 }
