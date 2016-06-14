@@ -9,7 +9,7 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Auth\Access\AuthorizesResources;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Input;
-use Illuminate\Support\Facades\Validator;
+use Validator;
 use Illuminate\Translation\FileLoader;
 use Illuminate\Contracts\Filesystem\Factory;
 use Illuminate\Support\Str;
@@ -20,6 +20,8 @@ use Mail;
 use Illuminate\Http\Request;
 use App\Gender;
 use Auth;
+
+
 
 class FrameworkController extends BaseController {
 
@@ -69,11 +71,13 @@ class FrameworkController extends BaseController {
             $info = null;
             $ExhistEmail = User::select('UserName')->where('UserName', $Email)->count();
             if ($ExhistEmail == 0) {
-                $val = Mail::raw($body, function ($ValidationToken)use($Email) {
-
-                            $ValidationToken->from('kaveri.nagunuri@karmanya.co.in', 'kaveri');
-                            $ValidationToken->to($Email)->subject('Generated ');
-                        });
+//                $val = Mail::raw($body, function ($ValidationToken)use($Email) {
+//
+//                            $ValidationToken->from('kaveri.nagunuri@karmanya.co.in', 'kaveri');
+//                            $ValidationToken->to($Email)->subject('Generated ');
+//                        });
+               $val=  Email($body, $ValidationToken, $Email);
+                
                 $GenderId = Gender::select('GenderId')->where('Name', $Gender)->get();
                 $GenderId = json_decode($GenderId);
                 foreach ($GenderId as $key) {
@@ -171,10 +175,11 @@ class FrameworkController extends BaseController {
                 $password = $key->Password;
             $body = "Dear User Registered Password of your respective email Id.
                     $password";
-            Mail::raw($body, function ($password)use($Email) {
-                $password->from('kaveri.nagunuri@karmanya.co.in', 'kaveri');
-                $password->to($Email)->subject('Retrived Password');
-            });
+//            Mail::raw($body, function ($password)use($Email) {
+//                $password->from('kaveri.nagunuri@karmanya.co.in', 'kaveri');
+//                $password->to($Email)->subject('Retrived Password');
+//            });
+            Email($body, $password, $Email);
             $alert = "Password is send to your email Id";
         } else
             $alert = "Your Email Id is not registered.Please Registered to access";
@@ -198,8 +203,45 @@ class FrameworkController extends BaseController {
         return Redirect::route('changepassword')
                         ->with('changepassword', 'Password successfully changed');
     }
+    
+    
+    //-----------------------------------Update Profile----------------------//
+    public function updateprofile() {
+        $details=Auth::user();
+        return view('Login.update',['details'=>$details]);
+        
+    }
+    public function modifiedprofile(){
+         $FirstName = Input::get('FirstName');
+        $lastName = Input::get('LastName');
+              $Date = new DateTime;
+              $info=null;
+        $Email = Input::get('UserName');
+        
+        $validator = Validator::make(Input::all(), array(
+                    'UserName' => 'required|max:50|email',
+                    'FirstName' => 'required|max:50|min:3',
+                    'LastName' => 'required|max:50|min:3',
+                   
+                        )
+        );
+        if ($validator->fails()) {
+            return Redirect::route('index')
+                            ->withErrors($validator)
+                            ->withInput();
+        } else {
+            $user = User::where('UserName',$Email)->
+                    update(['FirstName' => $FirstName,
+                            'LastName' => $lastName,
+                            'UpdateAt' => new DateTime]);
 
-    //------------------------Logout---------------------------//
+                $info.="successfully Updated";
+          
+        }
+        return Redirect::route('updateprofile')
+                ->with('status',$info);
+        }
+        //------------------------Logout---------------------------//
 
     public function logout() {
         Auth::logout();
@@ -207,5 +249,23 @@ class FrameworkController extends BaseController {
 //        return Redirect::route('login')
 //                        ->with('logout', 'successfully logged out');
     }
-
+    public function submit() {
+      
+    $validator = Validator::make(Input::all(), array(
+                    'UserName' => 'required|max:50|email',
+                    'FirstName' => 'required|max:50|min:3',
+                    'LastName' => 'required|max:50|min:3',
+                    'Password' => 'required|min:6',
+                        )
+        );
+      if($validator->fails()){
+          
+          print_r(json_encode($validator->errors()));
+          
+    }
+ else{
+    echo 'success';
+    
+ }   
+    }
 }

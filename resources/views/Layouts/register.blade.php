@@ -3,6 +3,7 @@
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="csrf-token" content="{{ csrf_token() }}">
         <title>AdminLTE 2 | Registration Page</title>
 
         <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
@@ -17,10 +18,12 @@
 
         <link rel="stylesheet" href="{{asset('/plugins/iCheck/square/blue.css')}}">
         <link rel="stylesheet"href="{{asset('css/styles.css')}}">
-        <script src="{{asset('JavaScript/jquery-2.2.2.min.js')}}"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.15.0/jquery.validate.min.js"></script>
+          <script src="{{asset('JavaScript/jquery-2.2.2.min.js')}}"></script>
+       
 
-        <script src="{{asset('JavaScript/Validations.js')}}"></script>
+          <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.15.0/jquery.validate.min.js"></script>
+
+          <script src="{{asset('JavaScript/Validations.js')}}"></script>
     </head>
     <body class="hold-transition register-page">
         <div class="register-box">
@@ -31,7 +34,11 @@
             @if(isset($message))
             <div class="alert alert-info">{{$message}}</div>
             @endif
-
+            <div class="alert alert-info info" style="display: none">
+                <ul>
+                    <li>alerts</li>
+                </ul>
+            </div>
             <div class="register-box-body">
                 <p class="login-box-msg">Register a new membership</p>
 
@@ -101,7 +108,6 @@
             @endif
 
         </div>
-
-    </script>
-</body>
+      
+    </body>
 </html>

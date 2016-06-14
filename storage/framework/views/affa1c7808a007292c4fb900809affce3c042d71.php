@@ -3,6 +3,7 @@
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
         <title>AdminLTE 2 | Registration Page</title>
 
         <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
@@ -17,10 +18,12 @@
 
         <link rel="stylesheet" href="<?php echo e(asset('/plugins/iCheck/square/blue.css')); ?>">
         <link rel="stylesheet"href="<?php echo e(asset('css/styles.css')); ?>">
-        <script src="<?php echo e(asset('JavaScript/jquery-2.2.2.min.js')); ?>"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.15.0/jquery.validate.min.js"></script>
+          <script src="<?php echo e(asset('JavaScript/jquery-2.2.2.min.js')); ?>"></script>
+       
 
-        <script src="<?php echo e(asset('JavaScript/Validations.js')); ?>"></script>
+          <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.15.0/jquery.validate.min.js"></script>
+
+          <script src="<?php echo e(asset('JavaScript/Validations.js')); ?>"></script>
     </head>
     <body class="hold-transition register-page">
         <div class="register-box">
@@ -31,7 +34,11 @@
             <?php if(isset($message)): ?>
             <div class="alert alert-info"><?php echo e($message); ?></div>
             <?php endif; ?>
-
+            <div class="alert alert-info info" style="display: none">
+                <ul>
+                    <li>alerts</li>
+                </ul>
+            </div>
             <div class="register-box-body">
                 <p class="login-box-msg">Register a new membership</p>
 
@@ -101,7 +108,6 @@
             <?php endif; ?>
 
         </div>
-
-    </script>
-</body>
+      
+    </body>
 </html>
