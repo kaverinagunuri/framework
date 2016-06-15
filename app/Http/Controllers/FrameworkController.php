@@ -32,16 +32,6 @@ class FrameworkController extends BaseController {
 
     //------------------------------Registration----------------------//
 
-
-    public function index() {
-        if (Auth::check()) {
-            return Redirect::route('Dashboard');
-        } else {
-
-            return view('Layouts/register');
-        }
-    }
-
     public function Register() {
         $FirstName = Input::get('FirstName');
         $lastName = Input::get('LastName');
@@ -123,14 +113,7 @@ class FrameworkController extends BaseController {
     }
 
     //------------------------------Login----------------------//
-    public function Login() {
-        if (Auth::check()) {
-            return Redirect::route('Dashboard');
-        } else {
-
-            return view('Layouts/login');
-        }
-    }
+    
 
     public function loggedIn() {
         $Email = Input::get('UserName');
@@ -179,6 +162,7 @@ class FrameworkController extends BaseController {
 //                $password->from('kaveri.nagunuri@karmanya.co.in', 'kaveri');
 //                $password->to($Email)->subject('Retrived Password');
 //            });
+            
             Email($body, $password, $Email);
             $alert = "Password is send to your email Id";
         } else
@@ -246,8 +230,7 @@ class FrameworkController extends BaseController {
     public function logout() {
         Auth::logout();
          return redirect(\URL::previous());
-//        return Redirect::route('login')
-//                        ->with('logout', 'successfully logged out');
+
     }
     public function submit() {
       

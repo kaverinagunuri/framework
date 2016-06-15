@@ -1,9 +1,12 @@
 <?php
 
 Route::group(['middlewareGroups' => 'web'], function () {
-    Route::get('/', array(
+    Route::get('index', array(
         'as' => 'index',
-        'uses' => 'FrameworkController@index'
+         'middleware'=>'Admin',
+        'uses' => function(){
+         return view('Layouts/register');
+        }
     ));
     Route::post('Register', array(
         'as' => 'Register',
@@ -13,24 +16,22 @@ Route::group(['middlewareGroups' => 'web'], function () {
         'as' => 'verifyEmail',
         'uses' => 'FrameworkController@ValidationToken'
     ));
-    Route::get('Dashboard', array(
+    Route::get('/', array(
         'as' => 'Dashboard',
-        //'middleware' => 'auth',
+        'middleware' => 'auth',
         'uses' => 'FrameworkController@Dashboard'
     ));
-//    Route::group(array('before' => 'auth'), function(){
-//    // your routes
-//
-//    Route::get('login', function(){
-//        return view('Layouts/login');
-//    });
-//});
+
     Route::get('login', array(
         'as' => 'login',
-        'uses' => 'FrameworkController@Login'
+        'middleware'=>'Admin',
+        'uses' => function(){
+          return view('Layouts/login');
+        }
     ));
     Route::get('forgotpassword', array(
         'as' => 'forgotpassword',
+             'middleware'=>'Admin',
         'uses' => 'FrameworkController@forgotpassword'
     ));
     Route::post('loggedIn', array(
@@ -71,4 +72,12 @@ Route::get('Formwithajax',array(
 Route::post('submit',array(
     'as'=>'submit',
     'uses'=>'FrameworkController@submit'));
+Route::get('service' ,array(
+    'as'=>'service',
+    'uses'=>function(helper $email){
+    $result=$email->Email('hai','hello','kaveri.nagunuri@karmanya.co.in');
+     
+
+    }
+));
  

@@ -1,11 +1,11 @@
 <?php
 
 namespace App\Http\Middleware;
-use Symfony\Component\HttpKernel\Exception\HttpException;
+
 use Illuminate\Support\Facades\Auth;
 use Closure;
 
-class Admin
+class Admin 
 {
     /**
      * Handle an incoming request.
@@ -14,17 +14,13 @@ class Admin
      * @param  \Closure  $next
      * @return mixed
      */
-   public function handle($request, Closure $next, $guard = null)
+    public function handle($request, Closure $next)
     {
-        if (Auth::guard($guard)->guest()) {
-          
-            if ($request->ajax() || $request->wantsJson()) {
-                return response('Unauthorized.', 401);
-            } else {
-                return redirect()->guest('login');
-            }
+       if (Auth::check()) {
+            return redirect('/');
         }
-
-        return $next($request);
+          return $next($request);
     }
+    
+
 }
