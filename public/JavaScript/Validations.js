@@ -18,7 +18,7 @@ $(document).ready(function () {
                 required: true,
                 minlength: 8
             },
-            Confirm: {
+            password_confirmation: {
                 required: true,
                 minlength: 8,
                 equalTo: "#Password"
@@ -43,7 +43,7 @@ $(document).ready(function () {
                 minlength: "Your Password Consists Atleast 8 characters"
 
             },
-            Confirm: {
+            password_confirmation: {
                 required: "Please Enter  Confirm Password ",
                 minlength: "Your Confirm Password Consists Atleast 8 characters",
                 equalTo: "Enter the Same Password as above"

@@ -9,7 +9,7 @@ class User extends Authenticatable {
     protected $table = "User";
     protected $primaryKey = "Id";
     public $remember_token=false;
-    protected $fillable = ['FirstName', 'LastName', 'UserName', 'GenderId', 'LastName', 'Password', 'ValidationToken', 'IsValidated', 'CreatedAt', 'UpdateAt', 'IsDeleted', 'DeletedAt'];
+    protected $fillable = ['FirstName', 'LastName', 'UserName', 'GenderId', 'LastName', 'Password', 'ValidationToken', 'IsValidated', 'CreatedAt', 'UpdateAt', 'IsDeleted', 'DeletedAt','Last_Login'];
     public $timestamps = false;
 
 }

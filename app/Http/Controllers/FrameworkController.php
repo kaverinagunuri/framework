@@ -20,8 +20,8 @@ use Mail;
 use Illuminate\Http\Request;
 use App\Gender;
 use Auth;
-
-
+use Event;
+use App\Events\LastLogin;
 
 class FrameworkController extends BaseController {
 
@@ -45,10 +45,11 @@ class FrameworkController extends BaseController {
                 . "http://framework.karmanya.co.in/verifyEmail/$ValidationToken";
 
         $validator = Validator::make(Input::all(), array(
-                    'UserName' => 'required|max:50|email',
+                    'UserName' => 'required|max:50|email|Unique:User',
                     'FirstName' => 'required|max:50|min:3',
                     'LastName' => 'required|max:50|min:3',
-                    'Password' => 'required|min:6',
+                    'Password' => 'Required|AlphaNum|Between:8,20|Confirmed',
+                    'password_confirmation' => 'Required|AlphaNum|Between:8,20'
                         )
         );
         if ($validator->fails()) {
@@ -66,8 +67,8 @@ class FrameworkController extends BaseController {
 //                            $ValidationToken->from('kaveri.nagunuri@karmanya.co.in', 'kaveri');
 //                            $ValidationToken->to($Email)->subject('Generated ');
 //                        });
-               $val=  Email($body, $ValidationToken, $Email);
-                
+                $val = Email($body, $ValidationToken, $Email);
+
                 $GenderId = Gender::select('GenderId')->where('Name', $Gender)->get();
                 $GenderId = json_decode($GenderId);
                 foreach ($GenderId as $key) {
@@ -113,7 +114,7 @@ class FrameworkController extends BaseController {
     }
 
     //------------------------------Login----------------------//
-    
+
 
     public function loggedIn() {
         $Email = Input::get('UserName');
@@ -122,8 +123,9 @@ class FrameworkController extends BaseController {
         if (count($validate) > 0) {
             $user = User::where('UserName', $Email)->where('Password', $Password)->first();
             Auth::login($user);
+            $details = Auth::user()->Id;
             //dd(Auth::user()->Id);
-
+            Event::fire(new LastLogin($details));
             $validate = json_decode($validate);
             return Redirect::route('Dashboard');
         } else {
@@ -162,7 +164,7 @@ class FrameworkController extends BaseController {
 //                $password->from('kaveri.nagunuri@karmanya.co.in', 'kaveri');
 //                $password->to($Email)->subject('Retrived Password');
 //            });
-            
+
             Email($body, $password, $Email);
             $alert = "Password is send to your email Id";
         } else
@@ -187,26 +189,24 @@ class FrameworkController extends BaseController {
         return Redirect::route('changepassword')
                         ->with('changepassword', 'Password successfully changed');
     }
-    
-    
+
     //-----------------------------------Update Profile----------------------//
     public function updateprofile() {
-        $details=Auth::user();
-        return view('Login.update',['details'=>$details]);
-        
+        $details = Auth::user();
+        return view('Login.update', ['details' => $details]);
     }
-    public function modifiedprofile(){
-         $FirstName = Input::get('FirstName');
+
+    public function modifiedprofile() {
+        $FirstName = Input::get('FirstName');
         $lastName = Input::get('LastName');
-              $Date = new DateTime;
-              $info=null;
+        $Date = new DateTime;
+        $info = null;
         $Email = Input::get('UserName');
-        
+
         $validator = Validator::make(Input::all(), array(
                     'UserName' => 'required|max:50|email',
                     'FirstName' => 'required|max:50|min:3',
                     'LastName' => 'required|max:50|min:3',
-                   
                         )
         );
         if ($validator->fails()) {
@@ -214,41 +214,49 @@ class FrameworkController extends BaseController {
                             ->withErrors($validator)
                             ->withInput();
         } else {
-            $user = User::where('UserName',$Email)->
+            $user = User::where('UserName', $Email)->
                     update(['FirstName' => $FirstName,
-                            'LastName' => $lastName,
-                            'UpdateAt' => new DateTime]);
+                'LastName' => $lastName,
+                'UpdateAt' => new DateTime]);
 
-                $info.="successfully Updated";
-          
+            $info.="successfully Updated";
         }
         return Redirect::route('updateprofile')
-                ->with('status',$info);
-        }
-        //------------------------Logout---------------------------//
+                        ->with('status', $info);
+    }
+
+    //------------------------Logout---------------------------//
 
     public function logout() {
         Auth::logout();
-         return redirect(\URL::previous());
-
+        return redirect(\URL::previous());
     }
+
     public function submit() {
-      
-    $validator = Validator::make(Input::all(), array(
-                    'UserName' => 'required|max:50|email',
+
+        $validator = Validator::make(Input::all(), array(
+                    'UserName' => 'required|max:50|email|Unique:User',
                     'FirstName' => 'required|max:50|min:3',
                     'LastName' => 'required|max:50|min:3',
                     'Password' => 'required|min:6',
                         )
         );
-      if($validator->fails()){
-          
-          print_r(json_encode($validator->errors()));
-          
+        if ($validator->fails()) {
+            $error = $validator->errors();
+            //        $error=( json_decode($error,true));
+            //     print_r($error);
+//      echo $error['UserName'][0];
+
+            $text = "<ul style='list-style: inline'>";
+
+            foreach ($validator->errors()->all() as $error) {
+                $text.="<li>" . $error . "</li>";
+            }
+            $text.="</ul>";
+            echo $text;
+        } else {
+            echo 'success';
+        }
     }
- else{
-    echo 'success';
-    
- }   
-    }
+
 }

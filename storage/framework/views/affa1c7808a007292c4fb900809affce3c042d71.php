@@ -80,7 +80,7 @@
                         <label for="Password" class="error"></label>
                     </div>
                     <div class="form-group has-feedback">
-                        <input type="password" class="form-control" placeholder="Confirm Password" name="Confirm"  id="Confirm"/>
+                        <input type="password" class="form-control" placeholder="Confirm Password" name="password_confirmation"  id="Confirm"/>
                         <span class="glyphicon glyphicon-lock form-control-feedback"></span>
                         <label for="Confirm" class="error"></label>
                     </div>

@@ -7,9 +7,7 @@ use Validator;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\ThrottlesLogins;
 use Illuminate\Foundation\Auth\AuthenticatesAndRegistersUsers;
-use Illuminate\Support\Facades\Input;
-use Auth;
-use Illuminate\Support\Facades\Redirect;
+
 class AuthController extends Controller
 {
     /*
@@ -30,7 +28,7 @@ class AuthController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = '/Dashboard';
+    protected $redirectTo = '/';
 
     /**
      * Create a new authentication controller instance.
@@ -40,31 +38,6 @@ class AuthController extends Controller
     public function __construct()
     {
         $this->middleware($this->guestMiddleware(), ['except' => 'logout']);
-    }
-    
-    public function loggedIn() {
-        $Email = Input::get('UserName');
-        $Password = Input::get('Password');
-        $validate = User::select('UserName', 'FirstName')->where('UserName', $Email)->where('Password', $Password)->get();
-        if (count($validate) > 0) {
-            $user = User::where('UserName', $Email)->where('Password', $Password)->first();
-            Auth::login($user);
-             //dd(Auth::user());
-
-            /*$validate = json_decode($validate);
-            foreach ($validate as $key) {
-                $name = $key->FirstName;
-            }*/
-       
-            //$this->Dashboard();
-            return Redirect::route('Dashboard');
-                           //->with('Login', $name);
-        } else {
-            $validate = "Invalid Crendentials";
-            return Redirect::route('login')
-                            ->withErrors($validate)
-                            ->withInput();
-        }
     }
 
     /**

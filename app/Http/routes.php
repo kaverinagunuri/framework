@@ -36,7 +36,7 @@ Route::group(['middlewareGroups' => 'web'], function () {
     ));
     Route::post('loggedIn', array(
         'as' => 'loggedIn',
-        'uses' => 'Auth\AuthController@loggedIn'
+        'uses' => 'FrameworkController@loggedIn'
     ));
     Route::post('retrivepassword', array(
         'as' => 'retrivepassword',
@@ -76,8 +76,8 @@ Route::get('service' ,array(
     'as'=>'service',
     'uses'=>function(helper $email){
     $result=$email->Email('hai','hello','kaveri.nagunuri@karmanya.co.in');
-     
-
+  
     }
 ));
- 
+
+
